@@ -1,19 +1,37 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {connect} from 'dva';
-import styles from './IndexPage.css';
-// import AppBar from '@material-ui/core/AppBar';
-import {AppBar, Toolbar, Typography, Grid, Container} from '@material-ui/core';
+import {AppBar, Avatar, Card, CircularProgress, Container, Grid, Toolbar, Typography} from '@material-ui/core';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
 import {fade, makeStyles} from '@material-ui/core/styles';
-// import AppBar from '@material-ui/core/AppBar';
-// import Toolbar from '@material-ui/core/Toolbar';
-// import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Paper from '@material-ui/core/Paper';
-
+import moment from 'moment';
+import InfiniteScroll from 'react-infinite-scroller';
 
 const useStyles = makeStyles(theme => ({
+  card: {
+    // Provide some spacing between cards
+    // margin: 10,
+    // padding: theme.spacing(2),
+
+    // Use flex layout with column direction for components in the card
+    // (CardContent and CardActions)
+    // display: "flex",
+    // flexDirection: "column",
+
+    // Justify the content so that CardContent will always be at the top of the card,
+    // and CardActions will be at the bottom
+    // justifyContent: "space-between"
+  },
+  loadingBlock: {
+
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   root: {
     flexGrow: 1,
   },
@@ -77,96 +95,158 @@ const useStyles = makeStyles(theme => ({
       },
     },
   },
+  media: {
+    height: 0,
+    paddingTop: '56.25%', // 16:9
+  },
+  infiniteScroll: {
+    minHeight: '100vh',
+    marginTop: 20,
+  }
 }));
 
-function IndexPage() {
+function IndexPage({
+                     totalResults,
+                     articles,
+                     dispatch,
+                     isLoading,
+                   }) {
+
+  // console.log('articlesarticles');
+  // console.log(articles);
+  // const {articles = []} = data || {};
+
   const classes = useStyles();
+
+  const renderedSearchBar = useMemo(() => (
+    <div className={classes.search}>
+      <div className={classes.searchIcon}>
+        <SearchIcon/>
+      </div>
+      <InputBase
+        placeholder="Search"
+        classes={{
+          root: classes.inputRoot,
+          input: classes.inputInput,
+        }}
+        onKeyUp={(e) => {
+          dispatch({
+            type: 'setKeyword',
+            payload: {keyword: e.target.value},
+          });
+        }}
+        inputProps={{'aria-label': 'search'}}
+      />
+    </div>
+  ), []);
 
   const renderedHeader = useMemo(() => (
     <AppBar position="static">
+
+      <Container maxWidth="md">
       <Toolbar>
         <Typography variant="h6">
           US News
         </Typography>
         <div style={{flexGrow: 1,}}/>
 
-        <div className={classes.search}>
-          <div className={classes.searchIcon}>
-            <SearchIcon/>
-          </div>
-          <InputBase
-            placeholder="Search"
-            classes={{
-              root: classes.inputRoot,
-              input: classes.inputInput,
-            }}
-            inputProps={{'aria-label': 'search'}}
-          />
-        </div>
+        {renderedSearchBar}
 
       </Toolbar>
+      </Container>
     </AppBar>
+  ), []);
+
+  const renderArticleCard = useCallback((article) => (
+    <Grid item md={4} sm={6} xs={12}>
+
+      <Card className={classes.card}>
+        <CardHeader
+          avatar={
+            <Avatar aria-label="recipe" className={classes.avatar}>
+              T
+            </Avatar>
+          }
+          title={article.source.name}
+          subheader={moment(article.publishedAt).format('YYYY-MM-DD HH:mm')}
+        />
+        <CardMedia
+          className={classes.media}
+          image={article.urlToImage}
+          title={article.title}
+        />
+        <CardContent>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {article.description}
+          </Typography>
+        </CardContent>
+      </Card>
+      {/*<Paper className={classes.paper}>item</Paper>*/}
+    </Grid>
   ), []);
 
   return (
     <>
       <CssBaseline/>
       {renderedHeader}
-      <main>
+      {isLoading ? <div className={classes.loadingBlock}><CircularProgress/></div> : null}
+      <main
+        className={classes.infiniteScroll}>
 
         <Container maxWidth="md">
-        <Grid container spacing={1}>
-          <Grid container item xs={12} spacing={3}>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
+          <InfiniteScroll
+            pageStart={1}
+            loadMore={(page) =>
+              dispatch({
+                type: 'news/fetch',
+                payload: {isAppend: true, page},
+              })
+            }
+            hasMore={!(articles.length >= totalResults)}
+            loader={
+              <div className={classes.loadingBlock}><CircularProgress/></div>
+            }
+          >
+            <Grid container spacing={1}>
+              <Grid container item xs={12} spacing={3}
+                    direction='row'
+                // alignItems="stretch"
+                    alignItems="stretch"
+              >
+                {articles.map((article) => (
+
+                  renderArticleCard(article)
+                ))}
+
+              </Grid>
             </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-            <Grid item lg={4} sm={6} xs={12}>
-              <Paper className={classes.paper}>item</Paper>
-            </Grid>
-          </Grid>
-        </Grid>
+          </InfiniteScroll>
         </Container>
 
       </main>
 
 
-      <div className={styles.normal}>
-        <h1 className={styles.title}>Yay! Welcome to dva!</h1>
-        <div className={styles.welcome}/>
-        <ul className={styles.list}>
-          <li>To get started, edit <code>src/index.js</code> and save to reload.</li>
-          <li><a href="https://github.com/dvajs/dva-docs/blob/master/v1/en-us/getting-started.md">Getting Started</a>
-          </li>
-        </ul>
-      </div>
     </>
   );
 }
 
 IndexPage.propTypes = {};
 
-export default connect()(IndexPage);
+export default connect(({news, loading}) => {
+  const {
+    totalResults,
+    articles,
+  } = news;
+
+  // const { visible: isScoreModalVisible } = scoreModals;
+  return {
+
+    // isLoading:
+    //   loading.effects['example/fetch'] ||
+    //   loading.effects['example/fetch'] ||
+    //   loading.effects['example/fetch'],
+    totalResults,
+    articles,
+    isLoading: loading.effects['news/fetch'],
+  };
+})(IndexPage);
