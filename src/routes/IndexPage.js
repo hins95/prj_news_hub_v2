@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     // justifyContent: "space-between"
   },
   loadingBlock: {
-
+    marginTop: 10,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -131,7 +131,7 @@ function IndexPage({
         }}
         onKeyUp={(e) => {
           dispatch({
-            type: 'setKeyword',
+            type: 'news/setKeyword',
             payload: {keyword: e.target.value},
           });
         }}
@@ -164,7 +164,7 @@ function IndexPage({
         <CardHeader
           avatar={
             <Avatar aria-label="recipe" className={classes.avatar}>
-              T
+              {article.source.name.charAt(0)}
             </Avatar>
           }
           title={article.source.name}
@@ -189,7 +189,7 @@ function IndexPage({
     <>
       <CssBaseline/>
       {renderedHeader}
-      {isLoading ? <div className={classes.loadingBlock}><CircularProgress/></div> : null}
+      {isLoading ? <div className={classes.loadingBlock}><CircularProgress thickness={10}/></div> : null}
       <main
         className={classes.infiniteScroll}>
 

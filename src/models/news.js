@@ -1,4 +1,5 @@
 import {queryNews} from "../services/news";
+import { delay } from 'dva/saga';
 
 export default {
 
@@ -28,10 +29,9 @@ export default {
     * fetch({payload}, {call, put, select}) {  // eslint-disable-line
 
       const {isAppend = false, page = 1} = payload;
-      console.log('ab');
-      const keyword = yield select(state => state.news.user);
 
-      console.log('abcc');
+      const keyword = yield select(state => state.news.keyword);
+
       let response = yield call(queryNews, {keyword, page});
 
       // const result = queryNews()
@@ -41,6 +41,24 @@ export default {
 
       yield put({type: 'save', payload: {articles, totalResults, isAppend}});
     },
+    setKeyword: [
+      function* ({payload}, {put, call, select}) {
+
+        yield delay(500);
+
+        const currentKeyword = yield select(state => state.news.keyword);
+
+        const {keyword: newKeyword} = payload;
+
+        if (currentKeyword === newKeyword) {
+          return;
+        }
+
+        yield put({type: 'saveKeyword', payload});
+        yield put({type: 'fetch', payload: {isAppend: false, page: 1}});
+        // return {...state, ...action.payload};
+      }, {type: 'takeLatest'}
+    ],
   },
 
   reducers: {
@@ -54,7 +72,7 @@ export default {
         return {...state, totalResults, articles};
       }
     },
-    setKeyword(state, action) {
+    saveKeyword(state, action) {
       return {...state, ...action.payload};
     },
   },
