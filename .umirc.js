@@ -6,21 +6,34 @@ export default {
         dva: {
           immer: true,
         },
-        antd: true,
+        // antd: true,
         routes: {
           exclude: [/models\//],
         },
         polyfills: ['ie9'],
         locale: {},
-        library: 'react',
+        library: 'preact',
         dynamicImport: {
           webpackChunkName: true,
-          loadingComponent: './components/Loading.js',
+          // loadingComponent: './components/Loading.js',
         },
         dll: {
           exclude: [],
         },
-        pwa: true,
+        pwa: {
+          manifestOptions: {
+            srcPath: './manifest.webmanifest',
+          },
+          workboxPluginMode: 'InjectManifest',
+
+          workboxOptions: {
+
+            importWorkboxFrom: 'local',
+            swSrc: './service-worker.js',
+            swDest: 'my-dest-sw.js',
+
+          },
+        },
         hd: true,
         fastClick: true,
         title: 'US News',
@@ -31,11 +44,16 @@ export default {
         //   { content: `alert('a');` },
         // ],
         headScripts: [],
-        metas: [{ charset: 'utf-8' }],
+        metas: [{charset: 'utf-8'}],
         links: [
-          { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap' },
-          { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons' },
-          ],
+          {rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap'},
+          {rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons'},
+        ],
+        ssr: true,
+
+        manifest: {
+          basePath: '/',
+        },
       },
     ],
   ],

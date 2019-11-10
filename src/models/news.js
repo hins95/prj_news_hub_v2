@@ -18,7 +18,7 @@ export default {
         console.log(pathname);
         console.log('hi');
         dispatch({
-          type: 'fetch',
+          type: 'initFetch',
           payload: {isAppend: false, page: 1},
         });
       });
@@ -26,6 +26,15 @@ export default {
   },
 
   effects: {
+
+    * initFetch({payload}, { put}) {  // eslint-disable-line
+
+      yield put({type: 'fetch', payload});
+    },
+    * fetchMore({payload}, {put}) {  // eslint-disable-line
+
+      yield put({type: 'fetch', payload});
+    },
     * fetch({payload}, {call, put, select}) {  // eslint-disable-line
 
       const {isAppend = false, page = 1} = payload;
@@ -42,7 +51,7 @@ export default {
       yield put({type: 'save', payload: {articles, totalResults, isAppend}});
     },
     setKeyword: [
-      function* ({payload}, {put, call, select}) {
+      function* ({payload}, {put, select}) {
 
         yield delay(500);
 
@@ -55,7 +64,7 @@ export default {
         }
 
         yield put({type: 'saveKeyword', payload});
-        yield put({type: 'fetch', payload: {isAppend: false, page: 1}});
+        yield put({type: 'initFetch', payload: {isAppend: false, page: 1}});
         // return {...state, ...action.payload};
       }, {type: 'takeLatest'}
     ],

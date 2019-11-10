@@ -10,9 +10,12 @@ import SearchIcon from '@material-ui/icons/Search';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import moment from 'moment';
 import InfiniteScroll from 'react-infinite-scroller';
+import Link from '@material-ui/core/Link';
 
 const useStyles = makeStyles(theme => ({
+  offset: theme.mixins.toolbar,
   card: {
+    height: '100%',
     // Provide some spacing between cards
     // margin: 10,
     // padding: theme.spacing(2),
@@ -27,7 +30,8 @@ const useStyles = makeStyles(theme => ({
     // justifyContent: "space-between"
   },
   loadingBlock: {
-    marginTop: 10,
+    marginTop: 90,
+    marginBottom: 120,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -100,7 +104,8 @@ const useStyles = makeStyles(theme => ({
     paddingTop: '56.25%', // 16:9
   },
   infiniteScroll: {
-    minHeight: '100vh',
+    minHeight: 600,
+    height: '100vh',
     marginTop: 20,
   }
 }));
@@ -141,9 +146,9 @@ function IndexPage({
   ), []);
 
   const renderedHeader = useMemo(() => (
-    <AppBar position="static">
+    <AppBar position="fixed">
 
-      <Container maxWidth="md">
+      <Container maxWidth="lg">
       <Toolbar>
         <Typography variant="h6">
           US News
@@ -176,6 +181,11 @@ function IndexPage({
           title={article.title}
         />
         <CardContent>
+          <Typography variant="h6" component="h2" gutterBottom>
+            <Link href={article.url} color="inherit" target="_blank"  rel="noopener noreferrer">
+            {article.title}
+            </Link>
+          </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
             {article.description}
           </Typography>
@@ -189,24 +199,26 @@ function IndexPage({
     <>
       <CssBaseline/>
       {renderedHeader}
-      {isLoading ? <div className={classes.loadingBlock}><CircularProgress thickness={10}/></div> : null}
+      <div className={classes.offset} />
+      {isLoading ? <div className={classes.loadingBlock}><CircularProgress size={60} thickness={4}/></div> : null}
       <main
         className={classes.infiniteScroll}>
 
-        <Container maxWidth="md">
+        <Container maxWidth="lg">
           <InfiniteScroll
             pageStart={1}
             loadMore={(page) =>
               dispatch({
-                type: 'news/fetch',
+                type: 'news/fetchMore',
                 payload: {isAppend: true, page},
               })
             }
-            hasMore={!(articles.length >= totalResults)}
+            hasMore={articles.length < 100 && articles.length !== 0}
             loader={
-              <div className={classes.loadingBlock}><CircularProgress/></div>
+              <div className={classes.loadingBlock}><CircularProgress size={60} thickness={4}/></div>
             }
           >
+
             <Grid container spacing={1}>
               <Grid container item xs={12} spacing={3}
                     direction='row'
@@ -247,6 +259,6 @@ export default connect(({news, loading}) => {
     //   loading.effects['example/fetch'],
     totalResults,
     articles,
-    isLoading: loading.effects['news/fetch'],
+    isLoading: loading.effects['news/initFetch'],
   };
 })(IndexPage);

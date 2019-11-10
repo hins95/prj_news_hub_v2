@@ -16,5 +16,5 @@ export function queryNews(payload) {
     extraQueryParams = {...extraQueryParams, q: keyword};
   }
   // const extraQueryParams = encodeURI(Object.entries(extraQueryParamsObj).map(([key, val]) => `${key}=${val}`).join('&'));
-  return request(`https://newsapi.org/v2/top-headlines?country=us&category=business&apiKey=dc83f5beab3549d7a10d4ec6e36c7498&${qs.stringify(extraQueryParams)}`);
+  return request(`https://newsapi.org/v2/everything?sources=the-new-york-times,the-washington-post&apiKey=dc83f5beab3549d7a10d4ec6e36c7498&pageSize=10&${qs.stringify(extraQueryParams)}`);
 }
